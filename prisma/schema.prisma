@@ -1,0 +1,56 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL") // 🔥 هذا المطلوب
+}
+
+generator client {
+  provider = "prisma-client-js"
+  
+}
+
+model Quiz {
+  id          Int          @id @default(autoincrement())
+  title       String
+  quizCode    String       @unique @default(cuid())
+  isActive    Boolean      @default(true)
+  timeLimit   Int?         // الموعد الافتراضي للمسابقة بالدقائق
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  questions   Question[]
+  submissions Submission[]
+}
+
+model Question {
+  id            Int      @id @default(autoincrement())
+  quizId        Int
+  quiz          Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  text          String
+  type          String
+  options       String?
+  correctAnswer String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Participant {
+  id          Int          @id @default(autoincrement())
+  name        String?
+  code        String       @unique
+  secretCode  String
+  totalScore  Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  submissions Submission[]
+}
+
+model Submission {
+  id            Int         @id @default(autoincrement())
+  quizId        Int
+  participantId Int
+  score         Int
+  answers       String?
+  quiz          Quiz        @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
