@@ -14,6 +14,7 @@ export declare class QuizzesService {
             correctAnswer: string | null;
         }[];
     } & {
+        status: string;
         id: number;
         createdAt: Date;
         updatedAt: Date;
@@ -21,18 +22,9 @@ export declare class QuizzesService {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        endedAt: Date | null;
     }>;
     findAll(): Promise<({
-        questions: {
-            id: number;
-            quizId: number;
-            createdAt: Date;
-            updatedAt: Date;
-            text: string;
-            type: string;
-            options: string | null;
-            correctAnswer: string | null;
-        }[];
         submissions: {
             id: number;
             quizId: number;
@@ -42,16 +34,6 @@ export declare class QuizzesService {
             createdAt: Date;
             updatedAt: Date;
         }[];
-    } & {
-        id: number;
-        createdAt: Date;
-        updatedAt: Date;
-        title: string;
-        quizCode: string;
-        isActive: boolean;
-        timeLimit: number | null;
-    })[]>;
-    findOne(id: number): Promise<{
         questions: {
             id: number;
             quizId: number;
@@ -62,6 +44,18 @@ export declare class QuizzesService {
             options: string | null;
             correctAnswer: string | null;
         }[];
+    } & {
+        status: string;
+        id: number;
+        createdAt: Date;
+        updatedAt: Date;
+        title: string;
+        quizCode: string;
+        isActive: boolean;
+        timeLimit: number | null;
+        endedAt: Date | null;
+    })[]>;
+    findOne(id: number): Promise<{
         submissions: ({
             participant: {
                 id: number;
@@ -81,7 +75,18 @@ export declare class QuizzesService {
             createdAt: Date;
             updatedAt: Date;
         })[];
+        questions: {
+            id: number;
+            quizId: number;
+            createdAt: Date;
+            updatedAt: Date;
+            text: string;
+            type: string;
+            options: string | null;
+            correctAnswer: string | null;
+        }[];
     } & {
+        status: string;
         id: number;
         createdAt: Date;
         updatedAt: Date;
@@ -89,6 +94,7 @@ export declare class QuizzesService {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        endedAt: Date | null;
     }>;
     findByCode(code: string): Promise<{
         questions: {
@@ -102,6 +108,7 @@ export declare class QuizzesService {
             correctAnswer: string | null;
         }[];
     } & {
+        status: string;
         id: number;
         createdAt: Date;
         updatedAt: Date;
@@ -109,6 +116,7 @@ export declare class QuizzesService {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        endedAt: Date | null;
     }>;
     update(id: number, updateQuizDto: any): Promise<{
         questions: {
@@ -122,6 +130,7 @@ export declare class QuizzesService {
             correctAnswer: string | null;
         }[];
     } & {
+        status: string;
         id: number;
         createdAt: Date;
         updatedAt: Date;
@@ -129,8 +138,10 @@ export declare class QuizzesService {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        endedAt: Date | null;
     }>;
     toggleStatus(id: number): Promise<{
+        status: string;
         id: number;
         createdAt: Date;
         updatedAt: Date;
@@ -138,8 +149,21 @@ export declare class QuizzesService {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        endedAt: Date | null;
+    }>;
+    endQuiz(id: number): Promise<{
+        status: string;
+        id: number;
+        createdAt: Date;
+        updatedAt: Date;
+        title: string;
+        quizCode: string;
+        isActive: boolean;
+        timeLimit: number | null;
+        endedAt: Date | null;
     }>;
     remove(id: number): Promise<{
+        status: string;
         id: number;
         createdAt: Date;
         updatedAt: Date;
@@ -147,5 +171,6 @@ export declare class QuizzesService {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        endedAt: Date | null;
     }>;
 }

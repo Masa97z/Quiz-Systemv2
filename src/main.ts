@@ -9,6 +9,8 @@ async function bootstrap() {
 
   app.enableCors();
 
+  // 1️⃣ ملفات الفرونت
+  app.use(express.static(join(__dirname, '..', 'public')));
 
   // 2️⃣ Swagger
   const config = new DocumentBuilder()

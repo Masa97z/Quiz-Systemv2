@@ -30,6 +30,9 @@ let ParticipantsController = class ParticipantsController {
     login(code, secretCode) {
         return this.participantsService.validateParticipant(code, secretCode);
     }
+    update(id, updateData) {
+        return this.participantsService.updateParticipant(id, updateData);
+    }
     remove(id) {
         return this.participantsService.remove(id);
     }
@@ -56,6 +59,14 @@ __decorate([
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", void 0)
 ], ParticipantsController.prototype, "login", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Object]),
+    __metadata("design:returntype", void 0)
+], ParticipantsController.prototype, "update", null);
 __decorate([
     (0, common_1.Delete)(':id'),
     __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),

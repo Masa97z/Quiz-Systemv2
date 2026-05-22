@@ -30,7 +30,18 @@ let ParticipantsService = class ParticipantsService {
     }
     findAll() {
         return this.prisma.participant.findMany({
+            include: {
+                _count: {
+                    select: { submissions: true }
+                }
+            },
             orderBy: { id: 'desc' },
+        });
+    }
+    updateParticipant(id, data) {
+        return this.prisma.participant.update({
+            where: { id },
+            data: { name: data.name },
         });
     }
     async validateParticipant(code, secretCode) {

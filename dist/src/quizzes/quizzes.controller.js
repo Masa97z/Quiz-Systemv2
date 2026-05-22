@@ -42,6 +42,9 @@ let QuizzesController = class QuizzesController {
     toggleStatus(id) {
         return this.quizzesService.toggleStatus(id);
     }
+    endQuiz(id) {
+        return this.quizzesService.endQuiz(id);
+    }
 };
 exports.QuizzesController = QuizzesController;
 __decorate([
@@ -93,6 +96,13 @@ __decorate([
     __metadata("design:paramtypes", [Number]),
     __metadata("design:returntype", void 0)
 ], QuizzesController.prototype, "toggleStatus", null);
+__decorate([
+    (0, common_1.Patch)(':id/end'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", void 0)
+], QuizzesController.prototype, "endQuiz", null);
 exports.QuizzesController = QuizzesController = __decorate([
     (0, common_1.Controller)('api/quizzes'),
     __metadata("design:paramtypes", [quizzes_service_1.QuizzesService])

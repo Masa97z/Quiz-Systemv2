@@ -15,6 +15,7 @@ export declare class QuizzesController {
             correctAnswer: string | null;
         }[];
     } & {
+        status: string;
         id: number;
         createdAt: Date;
         updatedAt: Date;
@@ -22,8 +23,18 @@ export declare class QuizzesController {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        endedAt: Date | null;
     }>;
     findAll(): Promise<({
+        submissions: {
+            id: number;
+            quizId: number;
+            participantId: number;
+            score: number;
+            answers: string | null;
+            createdAt: Date;
+            updatedAt: Date;
+        }[];
         questions: {
             id: number;
             quizId: number;
@@ -34,16 +45,8 @@ export declare class QuizzesController {
             options: string | null;
             correctAnswer: string | null;
         }[];
-        submissions: {
-            id: number;
-            quizId: number;
-            participantId: number;
-            score: number;
-            answers: string | null;
-            createdAt: Date;
-            updatedAt: Date;
-        }[];
     } & {
+        status: string;
         id: number;
         createdAt: Date;
         updatedAt: Date;
@@ -51,6 +54,7 @@ export declare class QuizzesController {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        endedAt: Date | null;
     })[]>;
     findByCode(code: string): Promise<{
         questions: {
@@ -64,6 +68,7 @@ export declare class QuizzesController {
             correctAnswer: string | null;
         }[];
     } & {
+        status: string;
         id: number;
         createdAt: Date;
         updatedAt: Date;
@@ -71,18 +76,9 @@ export declare class QuizzesController {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        endedAt: Date | null;
     }>;
     findOne(id: number): Promise<{
-        questions: {
-            id: number;
-            quizId: number;
-            createdAt: Date;
-            updatedAt: Date;
-            text: string;
-            type: string;
-            options: string | null;
-            correctAnswer: string | null;
-        }[];
         submissions: ({
             participant: {
                 id: number;
@@ -102,7 +98,18 @@ export declare class QuizzesController {
             createdAt: Date;
             updatedAt: Date;
         })[];
+        questions: {
+            id: number;
+            quizId: number;
+            createdAt: Date;
+            updatedAt: Date;
+            text: string;
+            type: string;
+            options: string | null;
+            correctAnswer: string | null;
+        }[];
     } & {
+        status: string;
         id: number;
         createdAt: Date;
         updatedAt: Date;
@@ -110,6 +117,7 @@ export declare class QuizzesController {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        endedAt: Date | null;
     }>;
     update(id: number, updateQuizDto: any): Promise<{
         questions: {
@@ -123,6 +131,7 @@ export declare class QuizzesController {
             correctAnswer: string | null;
         }[];
     } & {
+        status: string;
         id: number;
         createdAt: Date;
         updatedAt: Date;
@@ -130,8 +139,10 @@ export declare class QuizzesController {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        endedAt: Date | null;
     }>;
     remove(id: number): Promise<{
+        status: string;
         id: number;
         createdAt: Date;
         updatedAt: Date;
@@ -139,8 +150,10 @@ export declare class QuizzesController {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        endedAt: Date | null;
     }>;
     toggleStatus(id: number): Promise<{
+        status: string;
         id: number;
         createdAt: Date;
         updatedAt: Date;
@@ -148,5 +161,17 @@ export declare class QuizzesController {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        endedAt: Date | null;
+    }>;
+    endQuiz(id: number): Promise<{
+        status: string;
+        id: number;
+        createdAt: Date;
+        updatedAt: Date;
+        title: string;
+        quizCode: string;
+        isActive: boolean;
+        timeLimit: number | null;
+        endedAt: Date | null;
     }>;
 }

@@ -15,5 +15,14 @@ export declare class AppService {
             score: number;
             time: string;
         }[];
+        quizzesList: {
+            id: number;
+            title: string;
+            quizCode: string;
+            status: string;
+            createdAt: Date;
+            participantsCount: number;
+            winnersCount: number;
+        }[];
     }>;
 }

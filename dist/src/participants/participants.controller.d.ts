@@ -12,7 +12,11 @@ export declare class ParticipantsController {
         secretCode: string;
         totalScore: number;
     }>;
-    findAll(): import(".prisma/client").Prisma.PrismaPromise<{
+    findAll(): import(".prisma/client").Prisma.PrismaPromise<({
+        _count: {
+            submissions: number;
+        };
+    } & {
         id: number;
         createdAt: Date;
         updatedAt: Date;
@@ -20,7 +24,7 @@ export declare class ParticipantsController {
         code: string;
         secretCode: string;
         totalScore: number;
-    }[]>;
+    })[]>;
     login(code: string, secretCode: string): Promise<{
         id: number;
         createdAt: Date;
@@ -30,6 +34,17 @@ export declare class ParticipantsController {
         secretCode: string;
         totalScore: number;
     }>;
+    update(id: number, updateData: {
+        name?: string;
+    }): import(".prisma/client").Prisma.Prisma__ParticipantClient<{
+        id: number;
+        createdAt: Date;
+        updatedAt: Date;
+        name: string | null;
+        code: string;
+        secretCode: string;
+        totalScore: number;
+    }, never, import("@prisma/client/runtime/library").DefaultArgs>;
     remove(id: number): import(".prisma/client").Prisma.Prisma__ParticipantClient<{
         id: number;
         createdAt: Date;
