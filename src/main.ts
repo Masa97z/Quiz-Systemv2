@@ -9,8 +9,6 @@ async function bootstrap() {
 
   app.enableCors();
 
-  // 1️⃣ ملفات الفرونت
-  app.use(express.static(join(__dirname, '..', 'public')));
 
   // 2️⃣ Swagger
   const config = new DocumentBuilder()
@@ -23,17 +21,11 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api-docs', app, document);
 
-  // 3️⃣ fallback (مهم جدًا 👇)
-  app.use((req, res, next) => {
-    if (req.url.startsWith('/api') || req.url.startsWith('/api-docs')) {
-      return next();
-    }
-    res.sendFile(join(__dirname, '..', 'public', 'index.html'));
-  });
 
-  await app.listen(process.env.PORT || 3000);
 
-  console.log(`Application is running on: http://localhost:3000`);
-  console.log(`Swagger: http://localhost:3000/api-docs`);
+await app.listen(process.env.PORT || 5778, '0.0.0.0');
+
+  console.log(`Application is running on: http://localhost:5778`);
+  console.log(`Swagger: http://localhost:5778/api-docs`);
 }
 bootstrap();

@@ -12,10 +12,12 @@ model Quiz {
   id          Int          @id @default(autoincrement())
   title       String
   quizCode    String       @unique @default(cuid())
-  isActive    Boolean      @default(true)
+  isActive    Boolean      @default(true) // للحفاظ على التوافقية القديمة مؤقتا
+  status      String       @default("ACTIVE") // ACTIVE, PAUSED, ENDED
   timeLimit   Int?         // الموعد الافتراضي للمسابقة بالدقائق
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+  endedAt     DateTime?
   questions   Question[]
   submissions Submission[]
 }

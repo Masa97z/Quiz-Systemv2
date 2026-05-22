@@ -67,6 +67,8 @@ export class QuizzesService {
       }
     });
     if (!quiz) throw new NotFoundException('رمز المسابقة غير صحيح أو المسابقة غير موجودة');
+    if (quiz.status === 'ENDED') throw new NotFoundException('عذراً، هذه المسابقة منتهية ولا يمكن الدخول إليها');
+    if (quiz.status === 'PAUSED' || !quiz.isActive) throw new NotFoundException('المسابقة متوقفة مؤقتاً');
     return quiz;
   }
 
@@ -95,10 +97,30 @@ export class QuizzesService {
   async toggleStatus(id: number) {
     const quiz = await this.prisma.quiz.findUnique({ where: { id } });
     if (!quiz) throw new NotFoundException('المسابقة غير موجودة');
+    if (quiz.status === 'ENDED') throw new NotFoundException('لا يمكن تغيير حالة مسابقة منتهية');
+
+    const newStatus = quiz.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
+    const newIsActive = newStatus === 'ACTIVE';
 
     return this.prisma.quiz.update({
       where: { id },
-      data: { isActive: !quiz.isActive },
+      data: { status: newStatus, isActive: newIsActive },
+    });
+  }
+
+  // إنهاء المسابقة بشكل نهائي
+  async endQuiz(id: number) {
+    const quiz = await this.prisma.quiz.findUnique({ where: { id } });
+    if (!quiz) throw new NotFoundException('المسابقة غير موجودة');
+    if (quiz.status === 'ENDED') throw new NotFoundException('المسابقة منتهية بالفعل');
+
+    return this.prisma.quiz.update({
+      where: { id },
+      data: { 
+        status: 'ENDED', 
+        isActive: false,
+        endedAt: new Date()
+      },
     });
   }
 

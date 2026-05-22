@@ -25,7 +25,20 @@ export class ParticipantsService {
   // 2. جلب قائمة المتسابقين (للإدارة)
   findAll() {
     return this.prisma.participant.findMany({
+      include: {
+        _count: {
+          select: { submissions: true }
+        }
+      },
       orderBy: { id: 'desc' },
+    });
+  }
+
+  // تحديث بيانات المتسابق (مثل الاسم)
+  updateParticipant(id: number, data: { name?: string }) {
+    return this.prisma.participant.update({
+      where: { id },
+      data: { name: data.name },
     });
   }
 

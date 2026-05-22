@@ -10,25 +10,16 @@ export class AppService {
     // 1. إجمالي المشتركين
     const totalParticipants = await this.prisma.participant.count();
 
-    // 2. المسابقات النشطة
-    const activeQuizzes = await this.prisma.quiz.count();
+    // 2. إجمالي المسابقات
+    const totalQuizzes = await this.prisma.quiz.count();
 
-    // 3. نسبة الإجابات الصحيحة (متوسط النقاط)
-    const submissions = await this.prisma.submission.findMany({
-      include: { quiz: { include: { questions: true } } }
-    });
-    
-    let totalQuestionsAnswered = 0;
-    let totalCorrectAnswers = 0;
+    // 3. المسابقات المكتملة
+    const completedQuizzes = await this.prisma.quiz.count({ where: { status: 'ENDED' } });
 
-    submissions.forEach(sub => {
-      totalQuestionsAnswered += sub.quiz.questions.length;
-      totalCorrectAnswers += sub.score;
-    });
+    // 4. المسابقات النشطة
+    const activeQuizzes = await this.prisma.quiz.count({ where: { status: 'ACTIVE' } });
 
-    const successRate = totalQuestionsAnswered === 0 ? 0 : Math.round((totalCorrectAnswers / totalQuestionsAnswered) * 100);
-
-    // 4. أحدث المشاركات الواردة
+    // 5. أحدث المشاركات الواردة
     const recentActivity = await this.prisma.submission.findMany({
       take: 5,
       orderBy: { id: 'desc' },
@@ -38,22 +29,46 @@ export class AppService {
       }
     });
 
-    // تنسيق المشاركات الأخيرة للواجهة الأمامية
     const formattedActivity = recentActivity.map(act => ({
       id: act.id,
       code: act.participant.code,
       quiz: act.quiz.title,
       score: act.score,
-      time: 'مؤخراً' // يمكنك استخدام مكتبة مثل date-fns لحساب الوقت الفعلي
+      time: 'مؤخراً'
     }));
+
+    // 6. قائمة المسابقات للفرز في لوحة التحكم
+    const quizzesListRaw = await this.prisma.quiz.findMany({
+      include: {
+        _count: { select: { submissions: true } },
+        submissions: { select: { score: true } }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    const formattedQuizzesList = quizzesListRaw.map(q => {
+      const maxScore = q.submissions.reduce((max, sub) => sub.score > max ? sub.score : max, 0);
+      const winnersCount = q.submissions.filter(sub => sub.score === maxScore && maxScore > 0).length;
+      return {
+        id: q.id,
+        title: q.title,
+        quizCode: q.quizCode,
+        status: q.status,
+        createdAt: q.createdAt,
+        participantsCount: q._count.submissions,
+        winnersCount: winnersCount
+      };
+    });
 
     return {
       stats: [
         { title: 'إجمالي المشتركين', value: totalParticipants.toString(), icon: '👥' },
-        { title: 'الإجابات الصحيحة', value: `${successRate}%`, icon: '✅' },
+        { title: 'إجمالي المسابقات', value: totalQuizzes.toString(), icon: '📚' },
+        { title: 'المسابقات المكتملة', value: completedQuizzes.toString(), icon: '✅' },
         { title: 'المسابقات النشطة', value: activeQuizzes.toString(), icon: '🔥' },
       ],
-      recentActivity: formattedActivity
+      recentActivity: formattedActivity,
+      quizzesList: formattedQuizzesList
     };
   }
 }

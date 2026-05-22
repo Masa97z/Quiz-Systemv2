@@ -28,6 +28,12 @@ export class ParticipantsController {
     return this.participantsService.validateParticipant(code, secretCode);
   }
 
+  // PATCH: api/participants/5 -> لتعديل بيانات متسابق
+  @Patch(':id')
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateData: { name?: string }) {
+    return this.participantsService.updateParticipant(id, updateData);
+  }
+
   // DELETE: api/participants/5 -> حذف متسابق
   @Delete(':id')
   remove(@Param('id', ParseIntPipe) id: number) {

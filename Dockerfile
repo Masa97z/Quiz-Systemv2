@@ -36,6 +36,6 @@ RUN mkdir -p /app/data
 ENV DATABASE_URL="file:/app/data/quizDB.db"
 ENV NODE_ENV=production
 
-EXPOSE 3000
+EXPOSE 5778
 
 CMD ["sh", "-c", "npx prisma db push --skip-generate && node dist/src/main.js"]

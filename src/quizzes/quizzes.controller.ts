@@ -48,4 +48,10 @@ export class QuizzesController {
   toggleStatus(@Param('id', ParseIntPipe) id: number) {
     return this.quizzesService.toggleStatus(id);
   }
+
+  // PATCH: api/quizzes/5/end -> إنهاء المسابقة
+  @Patch(':id/end')
+  endQuiz(@Param('id', ParseIntPipe) id: number) {
+    return this.quizzesService.endQuiz(id);
+  }
 }
