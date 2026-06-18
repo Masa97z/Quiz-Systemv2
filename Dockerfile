@@ -31,9 +31,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/prisma ./prisma
 
-RUN mkdir -p /app/data
-
-ENV DATABASE_URL="file:/app/data/quizDB.db"
+ENV DATABASE_URL="postgresql://postgres:password@db:5432/quizdb?schema=public"
 ENV NODE_ENV=production
 
 EXPOSE 5778
