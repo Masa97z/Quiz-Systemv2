@@ -8,6 +8,22 @@ export declare class SubmissionsController {
         score: number;
         totalQuestions: number;
     }>;
+    getSubcategoryProgress(id: number, participantCode: string): Promise<{
+        subcategoryId: number;
+        subcategoryName: string;
+        participantCode: string;
+        participantName: string | null;
+        requiredQuizzes: number;
+        completedQuizzes: number;
+        isFullyCompleted: boolean;
+        quizResults: {
+            quizId: number;
+            title: string;
+            score: number;
+            totalQuestions: number;
+            isComplete: boolean;
+        }[];
+    }>;
     getLeaderboard(): Promise<{
         code: string;
         name: string | null;

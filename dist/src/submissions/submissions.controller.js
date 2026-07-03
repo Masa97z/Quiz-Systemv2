@@ -24,6 +24,9 @@ let SubmissionsController = class SubmissionsController {
     submit(createSubmissionDto) {
         return this.submissionsService.submitQuiz(createSubmissionDto);
     }
+    getSubcategoryProgress(id, participantCode) {
+        return this.submissionsService.getSubcategoryProgress(id, participantCode);
+    }
     getLeaderboard() {
         return this.submissionsService.getLeaderboard();
     }
@@ -36,6 +39,14 @@ __decorate([
     __metadata("design:paramtypes", [create_submission_dto_1.CreateSubmissionDto]),
     __metadata("design:returntype", void 0)
 ], SubmissionsController.prototype, "submit", null);
+__decorate([
+    (0, common_1.Get)('subcategories/:id/progress/:participantCode'),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Param)('participantCode')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, String]),
+    __metadata("design:returntype", void 0)
+], SubmissionsController.prototype, "getSubcategoryProgress", null);
 __decorate([
     (0, common_1.Get)('leaderboard'),
     __metadata("design:type", Function),

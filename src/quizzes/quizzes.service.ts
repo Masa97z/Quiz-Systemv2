@@ -1,26 +1,49 @@
 // src/quizzes/quizzes.service.ts
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateQuizDto } from './dto/create-quiz.dto';
 
 @Injectable()
 export class QuizzesService {
   constructor(private prisma: PrismaService) {}
 
+  private parseId(value: number | string | null | undefined, fieldName: string) {
+    if (value === null || value === undefined || value === '') return null;
+    const parsed = typeof value === 'number' ? value : parseInt(String(value), 10);
+    if (!Number.isInteger(parsed)) {
+      throw new BadRequestException(`قيمة ${fieldName} غير صحيحة`);
+    }
+    return parsed;
+  }
+
+  private async ensureSubcategory(subcategoryId: number | string | null | undefined) {
+    const parsedId = this.parseId(subcategoryId, 'subcategoryId');
+    if (parsedId === null) return null;
+
+    const subcategory = await this.prisma.subcategory.findUnique({ where: { id: parsedId } });
+    if (!subcategory) throw new NotFoundException('التصنيف الفرعي غير موجود');
+    return parsedId;
+  }
+
   // 1. إنشاء مسابقة جديدة مع أسئلتها دفعة واحدة (Nested Write)
   async create(createQuizDto: any) {
     const quizCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const subcategoryId = await this.ensureSubcategory(createQuizDto.subcategoryId);
+
     return this.prisma.quiz.create({
       data: {
         title: createQuizDto.title,
         quizCode,
-        timeLimit: createQuizDto.timeLimit ? parseInt(createQuizDto.timeLimit) : null,
+        subcategoryId,
+        timeLimit: createQuizDto.timeLimit ? parseInt(String(createQuizDto.timeLimit), 10) : null,
         questions: {
-          create: createQuizDto.questions, // إنشاء الأسئلة المرتبطة فوراً
+          create: createQuizDto.questions ?? [], // إنشاء الأسئلة المرتبطة فوراً
         },
       },
       include: {
-        questions: true, // إرجاع المسابقة مع أسئلتها بعد الإنشاء
+        questions: true,
+        subcategory: {
+          include: { category: true },
+        },
       },
     });
   }
@@ -30,10 +53,13 @@ export class QuizzesService {
     return this.prisma.quiz.findMany({
       include: {
         questions: true,
-        submissions: true, // لجلب إحصائيات المشاركين
+        submissions: true,
+        subcategory: {
+          include: { category: true },
+        },
       },
       orderBy: {
-        createdAt: 'desc', // ترتيب من الأحدث للأقدم
+        createdAt: 'desc',
       }
     });
   }
@@ -44,12 +70,15 @@ export class QuizzesService {
       where: { id },
       include: {
         questions: true,
+        subcategory: {
+          include: { category: true },
+        },
         submissions: {
           include: {
-            participant: true, // جلب بيانات المتسابق صاحب النتيجة
+            participant: true,
           },
           orderBy: {
-            score: 'desc' // ترتيب النتائج من الأعلى للأقل
+            score: 'desc'
           }
         },
       },
@@ -63,7 +92,10 @@ export class QuizzesService {
     const quiz = await this.prisma.quiz.findUnique({
       where: { quizCode: code },
       include: {
-        questions: { orderBy: { id: 'asc' } }
+        questions: { orderBy: { id: 'asc' } },
+        subcategory: {
+          include: { category: true },
+        },
       }
     });
     if (!quiz) throw new NotFoundException('رمز المسابقة غير صحيح أو المسابقة غير موجودة');
@@ -77,18 +109,27 @@ export class QuizzesService {
     const quiz = await this.prisma.quiz.findUnique({ where: { id } });
     if (!quiz) throw new NotFoundException('المسابقة غير موجودة');
 
+    const data: any = {
+      title: updateQuizDto.title,
+      timeLimit: updateQuizDto.timeLimit ? parseInt(String(updateQuizDto.timeLimit), 10) : null,
+      questions: {
+        deleteMany: {},
+        create: updateQuizDto.questions ?? [],
+      },
+    };
+
+    if (updateQuizDto.subcategoryId !== undefined) {
+      data.subcategoryId = await this.ensureSubcategory(updateQuizDto.subcategoryId);
+    }
+
     return this.prisma.quiz.update({
       where: { id },
-      data: {
-        title: updateQuizDto.title,
-        timeLimit: updateQuizDto.timeLimit ? parseInt(updateQuizDto.timeLimit) : null,
-        questions: {
-          deleteMany: {}, // حذف القديم
-          create: updateQuizDto.questions, // إنشاء الأسئلة الجديدة المرفقة
-        },
-      },
+      data,
       include: {
         questions: true,
+        subcategory: {
+          include: { category: true },
+        },
       },
     });
   }
@@ -116,11 +157,54 @@ export class QuizzesService {
 
     return this.prisma.quiz.update({
       where: { id },
-      data: { 
-        status: 'ENDED', 
+      data: {
+        status: 'ENDED',
         isActive: false,
         endedAt: new Date()
       },
+    });
+  }
+
+  async createCategory(createCategoryDto: any) {
+    return this.prisma.category.create({
+      data: {
+        name: createCategoryDto.name,
+        description: createCategoryDto.description ?? null,
+      },
+    });
+  }
+
+  async findAllCategories() {
+    return this.prisma.category.findMany({
+      include: { subcategories: true },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async createSubcategory(createSubcategoryDto: any) {
+    const categoryId = this.parseId(createSubcategoryDto.categoryId, 'categoryId');
+    if (categoryId === null) throw new BadRequestException('يجب اختيار التصنيف الرئيسي');
+
+    const category = await this.prisma.category.findUnique({ where: { id: categoryId } });
+    if (!category) throw new NotFoundException('التصنيف الرئيسي غير موجود');
+
+    return this.prisma.subcategory.create({
+      data: {
+        categoryId,
+        name: createSubcategoryDto.name,
+        description: createSubcategoryDto.description ?? null,
+      },
+      include: { category: true },
+    });
+  }
+
+  async findAllSubcategories() {
+    return this.prisma.subcategory.findMany({
+      include: {
+        category: true,
+        quizzes: true,
+      },
+      orderBy: { createdAt: 'desc' },
     });
   }
 

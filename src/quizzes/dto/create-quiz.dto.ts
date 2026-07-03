@@ -7,7 +7,20 @@ export class CreateQuestionDto {
     correctAnswer?: string;
 }
 
+export class CreateCategoryDto {
+    name: string;
+    description?: string;
+}
+
+export class CreateSubcategoryDto {
+    categoryId: number | string;
+    name: string;
+    description?: string;
+}
+
 export class CreateQuizDto {
     title: string;
+    subcategoryId: number | string;
+    timeLimit?: number | string;
     questions: CreateQuestionDto[]; // مصفوفة من الأسئلة
 }

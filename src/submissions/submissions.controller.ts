@@ -1,5 +1,5 @@
 // src/submissions/submissions.controller.ts
-import { Controller, Post, Body, Get } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, ParseIntPipe } from '@nestjs/common';
 import { SubmissionsService } from './submissions.service';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 
@@ -11,6 +11,15 @@ export class SubmissionsController {
   @Post()
   submit(@Body() createSubmissionDto: CreateSubmissionDto) {
     return this.submissionsService.submitQuiz(createSubmissionDto);
+  }
+
+  // GET: api/submissions/subcategories/5/progress/ABC123 -> اكتشاف إكمال التصنيف الفرعي
+  @Get('subcategories/:id/progress/:participantCode')
+  getSubcategoryProgress(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('participantCode') participantCode: string,
+  ) {
+    return this.submissionsService.getSubcategoryProgress(id, participantCode);
   }
 
   // GET: api/submissions/leaderboard -> لجلب لوحة الشرف

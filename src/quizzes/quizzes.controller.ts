@@ -1,7 +1,7 @@
 // src/quizzes/quizzes.controller.ts
 import { Controller, Get, Post, Put, Body, Param, Delete, ParseIntPipe, Patch } from '@nestjs/common';
 import { QuizzesService } from './quizzes.service';
-import { CreateQuizDto } from './dto/create-quiz.dto';
+import { CreateCategoryDto, CreateQuizDto, CreateSubcategoryDto } from './dto/create-quiz.dto';
 
 @Controller('api/quizzes') // مسار الـ API سيكون: http://localhost:3000/api/quizzes
 export class QuizzesController {
@@ -17,6 +17,30 @@ export class QuizzesController {
   @Get()
   findAll() {
     return this.quizzesService.findAll();
+  }
+
+  // GET: api/quizzes/categories -> لجلب كل التصنيفات
+  @Get('categories')
+  findAllCategories() {
+    return this.quizzesService.findAllCategories();
+  }
+
+  // POST: api/quizzes/categories -> إنشاء تصنيف رئيسي
+  @Post('categories')
+  createCategory(@Body() createCategoryDto: CreateCategoryDto) {
+    return this.quizzesService.createCategory(createCategoryDto);
+  }
+
+  // GET: api/quizzes/subcategories -> لجلب كل التصنيفات الفرعية
+  @Get('subcategories')
+  findAllSubcategories() {
+    return this.quizzesService.findAllSubcategories();
+  }
+
+  // POST: api/quizzes/subcategories -> إنشاء تصنيف فرعي
+  @Post('subcategories')
+  createSubcategory(@Body() createSubcategoryDto: CreateSubcategoryDto) {
+    return this.quizzesService.createSubcategory(createSubcategoryDto);
   }
 
   // GET: api/quizzes/code/123456 -> لجلب مسابقة بواسطة الكود

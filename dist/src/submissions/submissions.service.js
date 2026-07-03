@@ -69,6 +69,50 @@ let SubmissionsService = class SubmissionsService {
             totalQuestions: quiz.questions.length
         };
     }
+    async getSubcategoryProgress(subcategoryId, participantCode) {
+        const participant = await this.prisma.participant.findUnique({
+            where: { code: participantCode },
+        });
+        if (!participant)
+            throw new common_1.NotFoundException('المتسابق غير موجود');
+        const subcategory = await this.prisma.subcategory.findUnique({
+            where: { id: subcategoryId },
+            include: {
+                quizzes: {
+                    include: {
+                        questions: true,
+                    },
+                },
+            },
+        });
+        if (!subcategory)
+            throw new common_1.NotFoundException('التصنيف الفرعي غير موجود');
+        const quizResults = await Promise.all(subcategory.quizzes.map(async (quiz) => {
+            const submission = await this.prisma.submission.findFirst({
+                where: { quizId: quiz.id, participantId: participant.id },
+            });
+            const totalQuestions = quiz.questions.length;
+            const isComplete = Boolean(submission && submission.score === totalQuestions && totalQuestions > 0);
+            return {
+                quizId: quiz.id,
+                title: quiz.title,
+                score: submission?.score ?? 0,
+                totalQuestions,
+                isComplete,
+            };
+        }));
+        const completedQuizzes = quizResults.filter((quizResult) => quizResult.isComplete).length;
+        return {
+            subcategoryId: subcategory.id,
+            subcategoryName: subcategory.name,
+            participantCode: participant.code,
+            participantName: participant.name,
+            requiredQuizzes: quizResults.length,
+            completedQuizzes,
+            isFullyCompleted: quizResults.length > 0 && completedQuizzes === quizResults.length,
+            quizResults,
+        };
+    }
     async getLeaderboard() {
         const participants = await this.prisma.participant.findMany({
             orderBy: { totalScore: 'desc' },

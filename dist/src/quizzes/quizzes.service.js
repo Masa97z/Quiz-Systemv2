@@ -17,19 +17,42 @@ let QuizzesService = class QuizzesService {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    parseId(value, fieldName) {
+        if (value === null || value === undefined || value === '')
+            return null;
+        const parsed = typeof value === 'number' ? value : parseInt(String(value), 10);
+        if (!Number.isInteger(parsed)) {
+            throw new common_1.BadRequestException(`قيمة ${fieldName} غير صحيحة`);
+        }
+        return parsed;
+    }
+    async ensureSubcategory(subcategoryId) {
+        const parsedId = this.parseId(subcategoryId, 'subcategoryId');
+        if (parsedId === null)
+            return null;
+        const subcategory = await this.prisma.subcategory.findUnique({ where: { id: parsedId } });
+        if (!subcategory)
+            throw new common_1.NotFoundException('التصنيف الفرعي غير موجود');
+        return parsedId;
+    }
     async create(createQuizDto) {
         const quizCode = Math.floor(100000 + Math.random() * 900000).toString();
+        const subcategoryId = await this.ensureSubcategory(createQuizDto.subcategoryId);
         return this.prisma.quiz.create({
             data: {
                 title: createQuizDto.title,
                 quizCode,
-                timeLimit: createQuizDto.timeLimit ? parseInt(createQuizDto.timeLimit) : null,
+                subcategoryId,
+                timeLimit: createQuizDto.timeLimit ? parseInt(String(createQuizDto.timeLimit), 10) : null,
                 questions: {
-                    create: createQuizDto.questions,
+                    create: createQuizDto.questions ?? [],
                 },
             },
             include: {
                 questions: true,
+                subcategory: {
+                    include: { category: true },
+                },
             },
         });
     }
@@ -38,6 +61,9 @@ let QuizzesService = class QuizzesService {
             include: {
                 questions: true,
                 submissions: true,
+                subcategory: {
+                    include: { category: true },
+                },
             },
             orderBy: {
                 createdAt: 'desc',
@@ -49,6 +75,9 @@ let QuizzesService = class QuizzesService {
             where: { id },
             include: {
                 questions: true,
+                subcategory: {
+                    include: { category: true },
+                },
                 submissions: {
                     include: {
                         participant: true,
@@ -67,7 +96,10 @@ let QuizzesService = class QuizzesService {
         const quiz = await this.prisma.quiz.findUnique({
             where: { quizCode: code },
             include: {
-                questions: { orderBy: { id: 'asc' } }
+                questions: { orderBy: { id: 'asc' } },
+                subcategory: {
+                    include: { category: true },
+                },
             }
         });
         if (!quiz)
@@ -82,18 +114,25 @@ let QuizzesService = class QuizzesService {
         const quiz = await this.prisma.quiz.findUnique({ where: { id } });
         if (!quiz)
             throw new common_1.NotFoundException('المسابقة غير موجودة');
+        const data = {
+            title: updateQuizDto.title,
+            timeLimit: updateQuizDto.timeLimit ? parseInt(String(updateQuizDto.timeLimit), 10) : null,
+            questions: {
+                deleteMany: {},
+                create: updateQuizDto.questions ?? [],
+            },
+        };
+        if (updateQuizDto.subcategoryId !== undefined) {
+            data.subcategoryId = await this.ensureSubcategory(updateQuizDto.subcategoryId);
+        }
         return this.prisma.quiz.update({
             where: { id },
-            data: {
-                title: updateQuizDto.title,
-                timeLimit: updateQuizDto.timeLimit ? parseInt(updateQuizDto.timeLimit) : null,
-                questions: {
-                    deleteMany: {},
-                    create: updateQuizDto.questions,
-                },
-            },
+            data,
             include: {
                 questions: true,
+                subcategory: {
+                    include: { category: true },
+                },
             },
         });
     }
@@ -123,6 +162,45 @@ let QuizzesService = class QuizzesService {
                 isActive: false,
                 endedAt: new Date()
             },
+        });
+    }
+    async createCategory(createCategoryDto) {
+        return this.prisma.category.create({
+            data: {
+                name: createCategoryDto.name,
+                description: createCategoryDto.description ?? null,
+            },
+        });
+    }
+    async findAllCategories() {
+        return this.prisma.category.findMany({
+            include: { subcategories: true },
+            orderBy: { createdAt: 'desc' },
+        });
+    }
+    async createSubcategory(createSubcategoryDto) {
+        const categoryId = this.parseId(createSubcategoryDto.categoryId, 'categoryId');
+        if (categoryId === null)
+            throw new common_1.BadRequestException('يجب اختيار التصنيف الرئيسي');
+        const category = await this.prisma.category.findUnique({ where: { id: categoryId } });
+        if (!category)
+            throw new common_1.NotFoundException('التصنيف الرئيسي غير موجود');
+        return this.prisma.subcategory.create({
+            data: {
+                categoryId,
+                name: createSubcategoryDto.name,
+                description: createSubcategoryDto.description ?? null,
+            },
+            include: { category: true },
+        });
+    }
+    async findAllSubcategories() {
+        return this.prisma.subcategory.findMany({
+            include: {
+                category: true,
+                quizzes: true,
+            },
+            orderBy: { createdAt: 'desc' },
         });
     }
     async remove(id) {

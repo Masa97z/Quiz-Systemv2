@@ -8,18 +8,40 @@ generator client {
   
 }
 
+model Category {
+  id            Int           @id @default(autoincrement())
+  name          String
+  description   String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  subcategories Subcategory[]
+}
+
+model Subcategory {
+  id           Int           @id @default(autoincrement())
+  categoryId   Int
+  category     Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  name         String
+  description  String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  quizzes      Quiz[]
+}
+
 model Quiz {
-  id          Int          @id @default(autoincrement())
-  title       String
-  quizCode    String       @unique @default(cuid())
-  isActive    Boolean      @default(true) // للحفاظ على التوافقية القديمة مؤقتا
-  status      String       @default("ACTIVE") // ACTIVE, PAUSED, ENDED
-  timeLimit   Int?         // الموعد الافتراضي للمسابقة بالدقائق
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  endedAt     DateTime?
-  questions   Question[]
-  submissions Submission[]
+  id            Int          @id @default(autoincrement())
+  title         String
+  quizCode      String       @unique @default(cuid())
+  isActive      Boolean      @default(true) // للحفاظ على التوافقية القديمة مؤقتا
+  status        String       @default("ACTIVE") // ACTIVE, PAUSED, ENDED
+  timeLimit     Int?         // الموعد الافتراضي للمسابقة بالدقائق
+  subcategoryId Int?
+  subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id], onDelete: SetNull)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  endedAt       DateTime?
+  questions     Question[]
+  submissions   Submission[]
 }
 
 model Question {

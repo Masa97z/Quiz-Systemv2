@@ -1,9 +1,25 @@
 import { QuizzesService } from './quizzes.service';
-import { CreateQuizDto } from './dto/create-quiz.dto';
+import { CreateCategoryDto, CreateQuizDto, CreateSubcategoryDto } from './dto/create-quiz.dto';
 export declare class QuizzesController {
     private readonly quizzesService;
     constructor(quizzesService: QuizzesService);
     create(createQuizDto: CreateQuizDto): Promise<{
+        subcategory: ({
+            category: {
+                id: number;
+                createdAt: Date;
+                updatedAt: Date;
+                name: string;
+                description: string | null;
+            };
+        } & {
+            id: number;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
+            categoryId: number;
+            description: string | null;
+        }) | null;
         questions: {
             id: number;
             quizId: number;
@@ -23,9 +39,26 @@ export declare class QuizzesController {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        subcategoryId: number | null;
         endedAt: Date | null;
     }>;
     findAll(): Promise<({
+        subcategory: ({
+            category: {
+                id: number;
+                createdAt: Date;
+                updatedAt: Date;
+                name: string;
+                description: string | null;
+            };
+        } & {
+            id: number;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
+            categoryId: number;
+            description: string | null;
+        }) | null;
         submissions: {
             id: number;
             quizId: number;
@@ -54,9 +87,93 @@ export declare class QuizzesController {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        subcategoryId: number | null;
         endedAt: Date | null;
     })[]>;
+    findAllCategories(): Promise<({
+        subcategories: {
+            id: number;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
+            categoryId: number;
+            description: string | null;
+        }[];
+    } & {
+        id: number;
+        createdAt: Date;
+        updatedAt: Date;
+        name: string;
+        description: string | null;
+    })[]>;
+    createCategory(createCategoryDto: CreateCategoryDto): Promise<{
+        id: number;
+        createdAt: Date;
+        updatedAt: Date;
+        name: string;
+        description: string | null;
+    }>;
+    findAllSubcategories(): Promise<({
+        category: {
+            id: number;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
+            description: string | null;
+        };
+        quizzes: {
+            status: string;
+            id: number;
+            createdAt: Date;
+            updatedAt: Date;
+            title: string;
+            quizCode: string;
+            isActive: boolean;
+            timeLimit: number | null;
+            subcategoryId: number | null;
+            endedAt: Date | null;
+        }[];
+    } & {
+        id: number;
+        createdAt: Date;
+        updatedAt: Date;
+        name: string;
+        categoryId: number;
+        description: string | null;
+    })[]>;
+    createSubcategory(createSubcategoryDto: CreateSubcategoryDto): Promise<{
+        category: {
+            id: number;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
+            description: string | null;
+        };
+    } & {
+        id: number;
+        createdAt: Date;
+        updatedAt: Date;
+        name: string;
+        categoryId: number;
+        description: string | null;
+    }>;
     findByCode(code: string): Promise<{
+        subcategory: ({
+            category: {
+                id: number;
+                createdAt: Date;
+                updatedAt: Date;
+                name: string;
+                description: string | null;
+            };
+        } & {
+            id: number;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
+            categoryId: number;
+            description: string | null;
+        }) | null;
         questions: {
             id: number;
             quizId: number;
@@ -76,9 +193,26 @@ export declare class QuizzesController {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        subcategoryId: number | null;
         endedAt: Date | null;
     }>;
     findOne(id: number): Promise<{
+        subcategory: ({
+            category: {
+                id: number;
+                createdAt: Date;
+                updatedAt: Date;
+                name: string;
+                description: string | null;
+            };
+        } & {
+            id: number;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
+            categoryId: number;
+            description: string | null;
+        }) | null;
         submissions: ({
             participant: {
                 id: number;
@@ -117,9 +251,26 @@ export declare class QuizzesController {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        subcategoryId: number | null;
         endedAt: Date | null;
     }>;
     update(id: number, updateQuizDto: any): Promise<{
+        subcategory: ({
+            category: {
+                id: number;
+                createdAt: Date;
+                updatedAt: Date;
+                name: string;
+                description: string | null;
+            };
+        } & {
+            id: number;
+            createdAt: Date;
+            updatedAt: Date;
+            name: string;
+            categoryId: number;
+            description: string | null;
+        }) | null;
         questions: {
             id: number;
             quizId: number;
@@ -139,6 +290,7 @@ export declare class QuizzesController {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        subcategoryId: number | null;
         endedAt: Date | null;
     }>;
     remove(id: number): Promise<{
@@ -150,6 +302,7 @@ export declare class QuizzesController {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        subcategoryId: number | null;
         endedAt: Date | null;
     }>;
     toggleStatus(id: number): Promise<{
@@ -161,6 +314,7 @@ export declare class QuizzesController {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        subcategoryId: number | null;
         endedAt: Date | null;
     }>;
     endQuiz(id: number): Promise<{
@@ -172,6 +326,7 @@ export declare class QuizzesController {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        subcategoryId: number | null;
         endedAt: Date | null;
     }>;
 }

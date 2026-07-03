@@ -27,6 +27,18 @@ let QuizzesController = class QuizzesController {
     findAll() {
         return this.quizzesService.findAll();
     }
+    findAllCategories() {
+        return this.quizzesService.findAllCategories();
+    }
+    createCategory(createCategoryDto) {
+        return this.quizzesService.createCategory(createCategoryDto);
+    }
+    findAllSubcategories() {
+        return this.quizzesService.findAllSubcategories();
+    }
+    createSubcategory(createSubcategoryDto) {
+        return this.quizzesService.createSubcategory(createSubcategoryDto);
+    }
     findByCode(code) {
         return this.quizzesService.findByCode(code);
     }
@@ -60,6 +72,32 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], QuizzesController.prototype, "findAll", null);
+__decorate([
+    (0, common_1.Get)('categories'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], QuizzesController.prototype, "findAllCategories", null);
+__decorate([
+    (0, common_1.Post)('categories'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_quiz_dto_1.CreateCategoryDto]),
+    __metadata("design:returntype", void 0)
+], QuizzesController.prototype, "createCategory", null);
+__decorate([
+    (0, common_1.Get)('subcategories'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", void 0)
+], QuizzesController.prototype, "findAllSubcategories", null);
+__decorate([
+    (0, common_1.Post)('subcategories'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_quiz_dto_1.CreateSubcategoryDto]),
+    __metadata("design:returntype", void 0)
+], QuizzesController.prototype, "createSubcategory", null);
 __decorate([
     (0, common_1.Get)('code/:code'),
     __param(0, (0, common_1.Param)('code')),
