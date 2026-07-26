@@ -17,6 +17,16 @@ let SubmissionsService = class SubmissionsService {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    calculateEarnedPoints(quiz, rawScore, totalQuestions) {
+        if (totalQuestions <= 0)
+            return 0;
+        const quizPoints = Number(quiz.points ?? 0);
+        const subcategoryPoints = Number(quiz.subcategory?.points ?? 0);
+        const basePoints = quizPoints > 0 ? quizPoints : subcategoryPoints;
+        if (basePoints <= 0)
+            return rawScore;
+        return Math.round((rawScore / totalQuestions) * basePoints);
+    }
     async submitQuiz(dto) {
         const participant = await this.prisma.participant.findUnique({
             where: { code: dto.participantCode },
@@ -34,6 +44,7 @@ let SubmissionsService = class SubmissionsService {
                 questions: {
                     orderBy: { id: 'asc' },
                 },
+                subcategory: true,
             },
         });
         if (!quiz)
@@ -47,21 +58,17 @@ let SubmissionsService = class SubmissionsService {
                 score += 1;
             }
         });
-        const [submission] = await this.prisma.$transaction([
+        const earnedPoints = this.calculateEarnedPoints(quiz, score, quiz.questions.length);
+        await this.prisma.$transaction([
             this.prisma.submission.create({
                 data: {
                     quizId: quiz.id,
                     participantId: participant.id,
-                    score: score,
+                    score,
+                    earnedPoints,
                     answers: JSON.stringify(dto.answers)
                 },
             }),
-            this.prisma.participant.update({
-                where: { id: participant.id },
-                data: {
-                    totalScore: { increment: score }
-                }
-            })
         ]);
         return {
             message: 'تم استلام الإجابات بنجاح',
@@ -97,6 +104,7 @@ let SubmissionsService = class SubmissionsService {
                 quizId: quiz.id,
                 title: quiz.title,
                 score: submission?.score ?? 0,
+                earnedPoints: submission?.earnedPoints ?? 0,
                 totalQuestions,
                 isComplete,
             };
@@ -114,14 +122,34 @@ let SubmissionsService = class SubmissionsService {
         };
     }
     async getLeaderboard() {
-        const participants = await this.prisma.participant.findMany({
-            orderBy: { totalScore: 'desc' },
-            take: 10,
+        const submissions = await this.prisma.submission.findMany({
+            include: {
+                participant: true,
+            },
+            orderBy: [{ earnedPoints: 'desc' }, { score: 'desc' }, { createdAt: 'asc' }],
+            take: 50,
         });
-        return participants.map(participant => ({
-            code: participant.code,
-            name: participant.name,
-            totalScore: participant.totalScore
+        const leaderboardMap = new Map();
+        submissions.forEach((submission) => {
+            const participant = submission.participant;
+            const existing = leaderboardMap.get(participant.id);
+            if (existing) {
+                existing.totalScore += submission.earnedPoints;
+                return;
+            }
+            leaderboardMap.set(participant.id, {
+                code: participant.code,
+                name: participant.name,
+                totalScore: submission.earnedPoints,
+            });
+        });
+        return Array.from(leaderboardMap.values())
+            .sort((a, b) => b.totalScore - a.totalScore || (a.name ?? '').localeCompare(b.name ?? ''))
+            .slice(0, 10)
+            .map((entry) => ({
+            code: entry.code,
+            name: entry.name,
+            totalScore: entry.totalScore,
         }));
     }
 };

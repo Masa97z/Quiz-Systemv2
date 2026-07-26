@@ -20,6 +20,7 @@ export declare class SubmissionsController {
             quizId: number;
             title: string;
             score: number;
+            earnedPoints: number;
             totalQuestions: number;
             isComplete: boolean;
         }[];

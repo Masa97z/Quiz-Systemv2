@@ -12,10 +12,12 @@ export declare class CreateSubcategoryDto {
     categoryId: number | string;
     name: string;
     description?: string;
+    points?: number | string;
 }
 export declare class CreateQuizDto {
     title: string;
     subcategoryId: number | string;
     timeLimit?: number | string;
+    points?: number | string;
     questions: CreateQuestionDto[];
 }

@@ -3,6 +3,7 @@ import { CreateSubmissionDto } from './dto/create-submission.dto';
 export declare class SubmissionsService {
     private prisma;
     constructor(prisma: PrismaService);
+    private calculateEarnedPoints;
     submitQuiz(dto: CreateSubmissionDto): Promise<{
         message: string;
         score: number;
@@ -20,6 +21,7 @@ export declare class SubmissionsService {
             quizId: number;
             title: string;
             score: number;
+            earnedPoints: number;
             totalQuestions: number;
             isComplete: boolean;
         }[];

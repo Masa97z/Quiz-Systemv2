@@ -16,11 +16,13 @@ export class CreateSubcategoryDto {
     categoryId: number | string;
     name: string;
     description?: string;
+    points?: number | string;
 }
 
 export class CreateQuizDto {
     title: string;
     subcategoryId: number | string;
     timeLimit?: number | string;
+    points?: number | string;
     questions: CreateQuestionDto[]; // مصفوفة من الأسئلة
 }

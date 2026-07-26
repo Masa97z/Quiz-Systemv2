@@ -17,6 +17,7 @@ export declare class QuizzesController {
             createdAt: Date;
             updatedAt: Date;
             name: string;
+            points: number;
             categoryId: number;
             description: string | null;
         }) | null;
@@ -39,6 +40,7 @@ export declare class QuizzesController {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        points: number;
         subcategoryId: number | null;
         endedAt: Date | null;
     }>;
@@ -56,6 +58,7 @@ export declare class QuizzesController {
             createdAt: Date;
             updatedAt: Date;
             name: string;
+            points: number;
             categoryId: number;
             description: string | null;
         }) | null;
@@ -64,6 +67,7 @@ export declare class QuizzesController {
             quizId: number;
             participantId: number;
             score: number;
+            earnedPoints: number;
             answers: string | null;
             createdAt: Date;
             updatedAt: Date;
@@ -87,6 +91,7 @@ export declare class QuizzesController {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        points: number;
         subcategoryId: number | null;
         endedAt: Date | null;
     })[]>;
@@ -96,6 +101,7 @@ export declare class QuizzesController {
             createdAt: Date;
             updatedAt: Date;
             name: string;
+            points: number;
             categoryId: number;
             description: string | null;
         }[];
@@ -130,6 +136,7 @@ export declare class QuizzesController {
             quizCode: string;
             isActive: boolean;
             timeLimit: number | null;
+            points: number;
             subcategoryId: number | null;
             endedAt: Date | null;
         }[];
@@ -138,6 +145,7 @@ export declare class QuizzesController {
         createdAt: Date;
         updatedAt: Date;
         name: string;
+        points: number;
         categoryId: number;
         description: string | null;
     })[]>;
@@ -154,6 +162,7 @@ export declare class QuizzesController {
         createdAt: Date;
         updatedAt: Date;
         name: string;
+        points: number;
         categoryId: number;
         description: string | null;
     }>;
@@ -171,6 +180,7 @@ export declare class QuizzesController {
             createdAt: Date;
             updatedAt: Date;
             name: string;
+            points: number;
             categoryId: number;
             description: string | null;
         }) | null;
@@ -193,6 +203,7 @@ export declare class QuizzesController {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        points: number;
         subcategoryId: number | null;
         endedAt: Date | null;
     }>;
@@ -210,6 +221,7 @@ export declare class QuizzesController {
             createdAt: Date;
             updatedAt: Date;
             name: string;
+            points: number;
             categoryId: number;
             description: string | null;
         }) | null;
@@ -221,13 +233,13 @@ export declare class QuizzesController {
                 name: string | null;
                 code: string;
                 secretCode: string;
-                totalScore: number;
             };
         } & {
             id: number;
             quizId: number;
             participantId: number;
             score: number;
+            earnedPoints: number;
             answers: string | null;
             createdAt: Date;
             updatedAt: Date;
@@ -251,6 +263,7 @@ export declare class QuizzesController {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        points: number;
         subcategoryId: number | null;
         endedAt: Date | null;
     }>;
@@ -268,6 +281,7 @@ export declare class QuizzesController {
             createdAt: Date;
             updatedAt: Date;
             name: string;
+            points: number;
             categoryId: number;
             description: string | null;
         }) | null;
@@ -290,6 +304,7 @@ export declare class QuizzesController {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        points: number;
         subcategoryId: number | null;
         endedAt: Date | null;
     }>;
@@ -302,6 +317,7 @@ export declare class QuizzesController {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        points: number;
         subcategoryId: number | null;
         endedAt: Date | null;
     }>;
@@ -314,6 +330,7 @@ export declare class QuizzesController {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        points: number;
         subcategoryId: number | null;
         endedAt: Date | null;
     }>;
@@ -326,6 +343,7 @@ export declare class QuizzesController {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        points: number;
         subcategoryId: number | null;
         endedAt: Date | null;
     }>;

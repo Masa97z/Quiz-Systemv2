@@ -15,7 +15,7 @@ describe('SubmissionsService', () => {
           useValue: {
             participant: { findUnique: jest.fn(), update: jest.fn() },
             subcategory: { findUnique: jest.fn() },
-            submission: { findFirst: jest.fn() },
+            submission: { findFirst: jest.fn(), create: jest.fn() },
             quiz: { findUnique: jest.fn() },
             $transaction: jest.fn(),
           },
@@ -51,5 +51,33 @@ describe('SubmissionsService', () => {
     expect(result.completedQuizzes).toBe(2);
     expect(result.quizResults[0].isComplete).toBe(true);
     expect(result.quizResults[1].isComplete).toBe(true);
+  });
+
+  it('should store earned points per submission instead of mutating the participant total score', async () => {
+    jest.spyOn(prisma.participant as any, 'findUnique').mockResolvedValue({ id: 1, code: 'ABC123', name: 'Ali' });
+    jest.spyOn(prisma.quiz as any, 'findUnique').mockResolvedValue({
+      id: 10,
+      isActive: true,
+      points: 30,
+      questions: [{ correctAnswer: 'A' }, { correctAnswer: 'B' }, { correctAnswer: 'C' }],
+      subcategory: { points: 15 },
+    });
+    const createSpy = jest.spyOn(prisma.submission as any, 'create').mockResolvedValue({ id: 99 });
+    jest.spyOn(prisma.participant as any, 'update').mockResolvedValue({ id: 1 });
+    jest.spyOn(prisma as any, '$transaction').mockImplementation(async (operations: any[]) => {
+      const [submission] = await Promise.all(operations.map((operation) => operation));
+      return [submission, { id: 1 }];
+    });
+
+    await service.submitQuiz({
+      quizId: 10,
+      participantCode: 'ABC123',
+      answers: ['A', 'B', 'Z'],
+    } as any);
+
+    expect(createSpy).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ earnedPoints: 20 }),
+    }));
+    expect(prisma.participant.update).not.toHaveBeenCalled();
   });
 });

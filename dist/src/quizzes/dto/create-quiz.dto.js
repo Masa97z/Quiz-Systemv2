@@ -17,12 +17,14 @@ class CreateSubcategoryDto {
     categoryId;
     name;
     description;
+    points;
 }
 exports.CreateSubcategoryDto = CreateSubcategoryDto;
 class CreateQuizDto {
     title;
     subcategoryId;
     timeLimit;
+    points;
     questions;
 }
 exports.CreateQuizDto = CreateQuizDto;

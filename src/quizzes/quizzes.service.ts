@@ -15,6 +15,15 @@ export class QuizzesService {
     return parsed;
   }
 
+  private parseOptionalInt(value: number | string | null | undefined, fieldName: string) {
+    if (value === null || value === undefined || value === '') return 0;
+    const parsed = typeof value === 'number' ? value : parseInt(String(value), 10);
+    if (!Number.isInteger(parsed)) {
+      throw new BadRequestException(`قيمة ${fieldName} غير صحيحة`);
+    }
+    return parsed;
+  }
+
   private async ensureSubcategory(subcategoryId: number | string | null | undefined) {
     const parsedId = this.parseId(subcategoryId, 'subcategoryId');
     if (parsedId === null) return null;
@@ -35,6 +44,7 @@ export class QuizzesService {
         quizCode,
         subcategoryId,
         timeLimit: createQuizDto.timeLimit ? parseInt(String(createQuizDto.timeLimit), 10) : null,
+        points: this.parseOptionalInt(createQuizDto.points, 'points'),
         questions: {
           create: createQuizDto.questions ?? [], // إنشاء الأسئلة المرتبطة فوراً
         },
@@ -77,9 +87,10 @@ export class QuizzesService {
           include: {
             participant: true,
           },
-          orderBy: {
-            score: 'desc'
-          }
+          orderBy: [
+            { earnedPoints: 'desc' },
+            { score: 'desc' }
+          ]
         },
       },
     });
@@ -112,6 +123,7 @@ export class QuizzesService {
     const data: any = {
       title: updateQuizDto.title,
       timeLimit: updateQuizDto.timeLimit ? parseInt(String(updateQuizDto.timeLimit), 10) : null,
+      points: updateQuizDto.points !== undefined ? this.parseOptionalInt(updateQuizDto.points, 'points') : undefined,
       questions: {
         deleteMany: {},
         create: updateQuizDto.questions ?? [],
@@ -193,6 +205,7 @@ export class QuizzesService {
         categoryId,
         name: createSubcategoryDto.name,
         description: createSubcategoryDto.description ?? null,
+        points: this.parseOptionalInt(createSubcategoryDto.points, 'points'),
       },
       include: { category: true },
     });

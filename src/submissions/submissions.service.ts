@@ -7,6 +7,18 @@ import { CreateSubmissionDto } from './dto/create-submission.dto';
 export class SubmissionsService {
   constructor(private prisma: PrismaService) { }
 
+  private calculateEarnedPoints(quiz: { points?: number | null; subcategory?: { points?: number | null } | null }, rawScore: number, totalQuestions: number) {
+    if (totalQuestions <= 0) return 0;
+
+    const quizPoints = Number(quiz.points ?? 0);
+    const subcategoryPoints = Number(quiz.subcategory?.points ?? 0);
+    const basePoints = quizPoints > 0 ? quizPoints : subcategoryPoints;
+
+    if (basePoints <= 0) return rawScore;
+
+    return Math.round((rawScore / totalQuestions) * basePoints);
+  }
+
   // 1. استلام الإجابات، تصحيحها، وحفظ النتيجة
   async submitQuiz(dto: CreateSubmissionDto) {
     // جلب المتسابق
@@ -28,6 +40,7 @@ export class SubmissionsService {
         questions: {
           orderBy: { id: 'asc' }, // لضمان الترتيب الصحيح للأسئلة
         },
+        subcategory: true,
       },
     });
     if (!quiz) throw new NotFoundException('المسابقة غير موجودة');
@@ -43,22 +56,19 @@ export class SubmissionsService {
       }
     });
 
-    // حفظ النتيجة النهائية في قاعدة البيانات وزيادة إجمالي النقاط للمتسابق
-    const [submission] = await this.prisma.$transaction([
+    const earnedPoints = this.calculateEarnedPoints(quiz, score, quiz.questions.length);
+
+    // حفظ النتيجة النهائية في قاعدة البيانات لكل مشارك داخل المسابقة
+    await this.prisma.$transaction([
       this.prisma.submission.create({
         data: {
           quizId: quiz.id,
           participantId: participant.id,
-          score: score,
+          score,
+          earnedPoints,
           answers: JSON.stringify(dto.answers) // حفظ إجابات الطالب
         },
       }),
-      this.prisma.participant.update({
-        where: { id: participant.id },
-        data: {
-          totalScore: { increment: score }
-        }
-      })
     ]);
 
     return {
@@ -98,6 +108,7 @@ export class SubmissionsService {
         quizId: quiz.id,
         title: quiz.title,
         score: submission?.score ?? 0,
+        earnedPoints: submission?.earnedPoints ?? 0,
         totalQuestions,
         isComplete,
       };
@@ -119,15 +130,39 @@ export class SubmissionsService {
 
   // 2. جلب لوحة الشرف (أعلى المتسابقين نقاطاً في جميع المسابقات)
   async getLeaderboard() {
-    const participants = await this.prisma.participant.findMany({
-      orderBy: { totalScore: 'desc' },
-      take: 10,
+    const submissions = await this.prisma.submission.findMany({
+      include: {
+        participant: true,
+      },
+      orderBy: [{ earnedPoints: 'desc' }, { score: 'desc' }, { createdAt: 'asc' }],
+      take: 50,
     });
 
-    return participants.map(participant => ({
-      code: participant.code,
-      name: participant.name,
-      totalScore: participant.totalScore
-    }));
+    const leaderboardMap = new Map<number, { code: string; name: string | null; totalScore: number }>();
+
+    submissions.forEach((submission) => {
+      const participant = submission.participant;
+      const existing = leaderboardMap.get(participant.id);
+
+      if (existing) {
+        existing.totalScore += submission.earnedPoints;
+        return;
+      }
+
+      leaderboardMap.set(participant.id, {
+        code: participant.code,
+        name: participant.name,
+        totalScore: submission.earnedPoints,
+      });
+    });
+
+    return Array.from(leaderboardMap.values())
+      .sort((a, b) => b.totalScore - a.totalScore || (a.name ?? '').localeCompare(b.name ?? ''))
+      .slice(0, 10)
+      .map((entry) => ({
+        code: entry.code,
+        name: entry.name,
+        totalScore: entry.totalScore,
+      }));
   }
 }

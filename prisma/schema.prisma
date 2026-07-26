@@ -23,6 +23,7 @@ model Subcategory {
   category     Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   name         String
   description  String?
+  points       Int           @default(0)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   quizzes      Quiz[]
@@ -35,6 +36,7 @@ model Quiz {
   isActive      Boolean      @default(true) // للحفاظ على التوافقية القديمة مؤقتا
   status        String       @default("ACTIVE") // ACTIVE, PAUSED, ENDED
   timeLimit     Int?         // الموعد الافتراضي للمسابقة بالدقائق
+  points        Int          @default(0)
   subcategoryId Int?
   subcategory   Subcategory? @relation(fields: [subcategoryId], references: [id], onDelete: SetNull)
   createdAt     DateTime     @default(now())
@@ -61,7 +63,6 @@ model Participant {
   name        String?
   code        String       @unique
   secretCode  String
-  totalScore  Int          @default(0)
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   submissions Submission[]
@@ -72,6 +73,7 @@ model Submission {
   quizId        Int
   participantId Int
   score         Int
+  earnedPoints  Int         @default(0)
   answers       String?
   quiz          Quiz        @relation(fields: [quizId], references: [id], onDelete: Cascade)
   participant   Participant @relation(fields: [participantId], references: [id], onDelete: Cascade)

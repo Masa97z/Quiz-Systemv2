@@ -26,6 +26,15 @@ let QuizzesService = class QuizzesService {
         }
         return parsed;
     }
+    parseOptionalInt(value, fieldName) {
+        if (value === null || value === undefined || value === '')
+            return 0;
+        const parsed = typeof value === 'number' ? value : parseInt(String(value), 10);
+        if (!Number.isInteger(parsed)) {
+            throw new common_1.BadRequestException(`قيمة ${fieldName} غير صحيحة`);
+        }
+        return parsed;
+    }
     async ensureSubcategory(subcategoryId) {
         const parsedId = this.parseId(subcategoryId, 'subcategoryId');
         if (parsedId === null)
@@ -44,6 +53,7 @@ let QuizzesService = class QuizzesService {
                 quizCode,
                 subcategoryId,
                 timeLimit: createQuizDto.timeLimit ? parseInt(String(createQuizDto.timeLimit), 10) : null,
+                points: this.parseOptionalInt(createQuizDto.points, 'points'),
                 questions: {
                     create: createQuizDto.questions ?? [],
                 },
@@ -82,9 +92,10 @@ let QuizzesService = class QuizzesService {
                     include: {
                         participant: true,
                     },
-                    orderBy: {
-                        score: 'desc'
-                    }
+                    orderBy: [
+                        { earnedPoints: 'desc' },
+                        { score: 'desc' }
+                    ]
                 },
             },
         });
@@ -117,6 +128,7 @@ let QuizzesService = class QuizzesService {
         const data = {
             title: updateQuizDto.title,
             timeLimit: updateQuizDto.timeLimit ? parseInt(String(updateQuizDto.timeLimit), 10) : null,
+            points: updateQuizDto.points !== undefined ? this.parseOptionalInt(updateQuizDto.points, 'points') : undefined,
             questions: {
                 deleteMany: {},
                 create: updateQuizDto.questions ?? [],
@@ -190,6 +202,7 @@ let QuizzesService = class QuizzesService {
                 categoryId,
                 name: createSubcategoryDto.name,
                 description: createSubcategoryDto.description ?? null,
+                points: this.parseOptionalInt(createSubcategoryDto.points, 'points'),
             },
             include: { category: true },
         });

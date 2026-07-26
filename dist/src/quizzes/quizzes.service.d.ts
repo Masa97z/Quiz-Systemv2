@@ -3,6 +3,7 @@ export declare class QuizzesService {
     private prisma;
     constructor(prisma: PrismaService);
     private parseId;
+    private parseOptionalInt;
     private ensureSubcategory;
     create(createQuizDto: any): Promise<{
         subcategory: ({
@@ -18,6 +19,7 @@ export declare class QuizzesService {
             createdAt: Date;
             updatedAt: Date;
             name: string;
+            points: number;
             categoryId: number;
             description: string | null;
         }) | null;
@@ -40,6 +42,7 @@ export declare class QuizzesService {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        points: number;
         subcategoryId: number | null;
         endedAt: Date | null;
     }>;
@@ -57,6 +60,7 @@ export declare class QuizzesService {
             createdAt: Date;
             updatedAt: Date;
             name: string;
+            points: number;
             categoryId: number;
             description: string | null;
         }) | null;
@@ -65,6 +69,7 @@ export declare class QuizzesService {
             quizId: number;
             participantId: number;
             score: number;
+            earnedPoints: number;
             answers: string | null;
             createdAt: Date;
             updatedAt: Date;
@@ -88,6 +93,7 @@ export declare class QuizzesService {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        points: number;
         subcategoryId: number | null;
         endedAt: Date | null;
     })[]>;
@@ -105,6 +111,7 @@ export declare class QuizzesService {
             createdAt: Date;
             updatedAt: Date;
             name: string;
+            points: number;
             categoryId: number;
             description: string | null;
         }) | null;
@@ -116,13 +123,13 @@ export declare class QuizzesService {
                 name: string | null;
                 code: string;
                 secretCode: string;
-                totalScore: number;
             };
         } & {
             id: number;
             quizId: number;
             participantId: number;
             score: number;
+            earnedPoints: number;
             answers: string | null;
             createdAt: Date;
             updatedAt: Date;
@@ -146,6 +153,7 @@ export declare class QuizzesService {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        points: number;
         subcategoryId: number | null;
         endedAt: Date | null;
     }>;
@@ -163,6 +171,7 @@ export declare class QuizzesService {
             createdAt: Date;
             updatedAt: Date;
             name: string;
+            points: number;
             categoryId: number;
             description: string | null;
         }) | null;
@@ -185,6 +194,7 @@ export declare class QuizzesService {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        points: number;
         subcategoryId: number | null;
         endedAt: Date | null;
     }>;
@@ -202,6 +212,7 @@ export declare class QuizzesService {
             createdAt: Date;
             updatedAt: Date;
             name: string;
+            points: number;
             categoryId: number;
             description: string | null;
         }) | null;
@@ -224,6 +235,7 @@ export declare class QuizzesService {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        points: number;
         subcategoryId: number | null;
         endedAt: Date | null;
     }>;
@@ -236,6 +248,7 @@ export declare class QuizzesService {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        points: number;
         subcategoryId: number | null;
         endedAt: Date | null;
     }>;
@@ -248,6 +261,7 @@ export declare class QuizzesService {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        points: number;
         subcategoryId: number | null;
         endedAt: Date | null;
     }>;
@@ -264,6 +278,7 @@ export declare class QuizzesService {
             createdAt: Date;
             updatedAt: Date;
             name: string;
+            points: number;
             categoryId: number;
             description: string | null;
         }[];
@@ -287,6 +302,7 @@ export declare class QuizzesService {
         createdAt: Date;
         updatedAt: Date;
         name: string;
+        points: number;
         categoryId: number;
         description: string | null;
     }>;
@@ -307,6 +323,7 @@ export declare class QuizzesService {
             quizCode: string;
             isActive: boolean;
             timeLimit: number | null;
+            points: number;
             subcategoryId: number | null;
             endedAt: Date | null;
         }[];
@@ -315,6 +332,7 @@ export declare class QuizzesService {
         createdAt: Date;
         updatedAt: Date;
         name: string;
+        points: number;
         categoryId: number;
         description: string | null;
     })[]>;
@@ -327,6 +345,7 @@ export declare class QuizzesService {
         quizCode: string;
         isActive: boolean;
         timeLimit: number | null;
+        points: number;
         subcategoryId: number | null;
         endedAt: Date | null;
     }>;

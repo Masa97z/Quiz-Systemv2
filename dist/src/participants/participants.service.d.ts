@@ -10,7 +10,6 @@ export declare class ParticipantsService {
         name: string | null;
         code: string;
         secretCode: string;
-        totalScore: number;
     }>;
     findAll(): import(".prisma/client").Prisma.PrismaPromise<({
         _count: {
@@ -23,7 +22,6 @@ export declare class ParticipantsService {
         name: string | null;
         code: string;
         secretCode: string;
-        totalScore: number;
     })[]>;
     updateParticipant(id: number, data: {
         name?: string;
@@ -34,7 +32,6 @@ export declare class ParticipantsService {
         name: string | null;
         code: string;
         secretCode: string;
-        totalScore: number;
     }, never, import("@prisma/client/runtime/library").DefaultArgs>;
     validateParticipant(code: string, secretCode: string): Promise<{
         id: number;
@@ -43,7 +40,6 @@ export declare class ParticipantsService {
         name: string | null;
         code: string;
         secretCode: string;
-        totalScore: number;
     }>;
     remove(id: number): import(".prisma/client").Prisma.Prisma__ParticipantClient<{
         id: number;
@@ -52,6 +48,5 @@ export declare class ParticipantsService {
         name: string | null;
         code: string;
         secretCode: string;
-        totalScore: number;
     }, never, import("@prisma/client/runtime/library").DefaultArgs>;
 }
