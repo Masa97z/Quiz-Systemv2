@@ -63,7 +63,11 @@ export class QuizzesService {
     return this.prisma.quiz.findMany({
       include: {
         questions: true,
-        submissions: true,
+        submissions: {
+          include: {
+            participant: true,
+          },
+        },
         subcategory: {
           include: { category: true },
         },
